@@ -1,2 +1,2 @@
 # movie_recommender
-Movie recommenders website with Django, MySql, Numpy, Pandas, Sklearn etc
+Movie recommenders website with Flask micro web framework, Sqlite, Numpy, Pandas, Sklearn etc
