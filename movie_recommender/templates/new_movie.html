@@ -1,0 +1,58 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+New Movie
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('.static', filename='new_movie.css')}}">
+{% endblock %}
+<body class="body2" style="background-color:black">
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% block content %}
+<div class="container">
+    <br>
+    <form class="form-signin" method="POST" action="/new_movie" enctype="multipart/form-data">
+        <h2 class="form-signin-heading">New Movie</h2>
+        {% if error %}
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">×</span></button>
+            {{message}}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% endif %}
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.title) }}
+        {{ wtf.form_field(form.year) }}
+        {{ wtf.form_field(form.link) }}
+        {{ wtf.form_field(form.view_key) }}
+        {{ wtf.form_field(form.is_trending) }}
+        <h4 class="form-signin-heading">Icon</h4>
+        <input type="file" name="file" autocomplete="off" required>
+        <button class="btn btn-lg btn-primary btn-block" onclick="myFunction()" type="submit">Add</button>
+    </form>
+
+</div> <!-- /container -->
+{% endblock %}
+<script>
+function myFunction() {
+  alert("Movie has been added.");
+}
+</script>
+</body>

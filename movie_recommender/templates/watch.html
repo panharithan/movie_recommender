@@ -1,0 +1,16 @@
+{% extends "header.html" %}
+{% block content %}
+    {% if link %}
+
+    <div class="container">
+    <div align="center" class="embed-responsive embed-responsive-16by9">
+        <iframe width="80%" height="80%" src={{link}} allowfullscreen="allowfullscreen"></iframe>
+    </div>
+    {%else%}
+        <h1 style="background-color:white">Not Found</h1>
+                <iframe width="80%" height="80%" src="https://drive.google.com/open?id=1yQKxEuqImlgeCobYZNoPl0tlil40WgjZ" allowfullscreen="allowfullscreen"></iframe>
+        <iframe src="https://drive.google.com/file/d/1yQKxEuqImlgeCobYZNoPl0tlil40WgjZ/preview" width="640" height="480" allowfullscreen="allowfullscreen"></iframe>
+
+    {%endif%}
+</div>
+{% endblock content %}

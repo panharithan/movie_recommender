@@ -1,0 +1,82 @@
+{% extends "header.html" %}
+{% block content %}
+
+<div align="center">
+    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+                {% for i in range(0, new_movies|length ) %}
+                    {% if i == 0%}
+                        <li data-target="#myCarousel" data-slide-to={{i|string}} class="active"></li>
+                    {% elif i < 5  %}
+                        <li data-target="#myCarousel" data-slide-to={{i|string}}></li>
+                    {%endif%}
+                {% endfor %}
+        </ol>
+
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+            {% for i in range(0, new_movies|length ) %}
+                {% if i == 0%}
+                    <div class="item active">
+                        <a href={{new_movies[i].get('page_link')}}>
+                            <img src={{new_movies[i].get('icon')}} alt={{new_movies[i].get('title')}} style="width:100%;"/>
+                        </a>
+                        <div class="carousel-caption">
+                            <h3>{{new_movies[i].get('title')}}</h3>
+                            <p>{{new_movies[i].get('year')}}</p>-->
+                        </div>
+                    </div>
+                {% elif i < 5 %}
+                    <div class="item">
+                        <a href={{new_movies[i].get('page_link')}}>
+                            <img src={{new_movies[i].get('icon')}} alt={{new_movies[i].get('title')}} style="width:100%;"/>
+                        </a>
+                        <div class="carousel-caption">
+                            <h3>{{new_movies[i].get('title')}}</h3>
+                            <p>{{new_movies[i].get('year')}}</p>-->
+                        </div>
+                    </div>
+                {%endif%}
+            {% endfor%}
+        </div>
+
+        <!-- Left and right controls -->
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+    <br>
+
+    <div class="container">
+
+        {% for movie in new_movies %}
+        {% if loop.index0 % 3 == 0 %}
+        <div class="row">
+            {% endif %}
+            <div class="col-sm-4">
+                <div>
+                    <a href={{movie.get('page_link')}}>
+                    <img src={{movie.icon}} alt={{movie.title}} style="width:100%;">
+                    </a>
+                    <div class="top-left"><i class="fa fa-eye"></i> {{movie.total_view}} views</div>
+                    <div class="bottom-center">{{movie.title}} {{movie.year}}</div>
+                </div>
+                <br>
+            </div>
+            {% if loop.index0 % 3 == 2 or loop.last %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <br>
+
+</div>
+<br><br>
+
+{% endblock content %}
