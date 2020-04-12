@@ -1,3 +1,4 @@
+from datetime import datetime
 from passlib.hash import sha256_crypt
 from sqlalchemy import or_
 from flask import render_template, url_for, flash, redirect, request, session, flash
@@ -9,14 +10,15 @@ from movie_recommender import db
 from movie_recommender.models import RegisterForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from tools.token import confirm_token, generate_confirmation_token
+from tools.email import send_email
 
 
 @app.route("/")
 @app.route("/home")
 def home():
-    print("session: ", session)
-    print("user_id: ", session.get('user_id'))
-    print("username: ", session.get('username'))
+
+    print(current_user)
     new_movies = []
     for movie in Movie.query.all():
         new_movies.append({
@@ -32,7 +34,8 @@ def home():
         })
     return render_template('index.html',
                            menus=['Home', 'Contact', 'About', 'Login'],
-                           new_movies=new_movies, username=session.get('username'))
+                           new_movies=new_movies, username=session.get('username'),
+                           is_authenticated=current_user.is_authenticated)
 
 
 @app.route("/watch")
@@ -76,10 +79,17 @@ def login():
 def signup():
     form = RegisterForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        new_user = User(username=form.username.data, email=form.email.data,
+                        password=form.password.data, is_admin=False)
+
         db.session.add(new_user)
         db.session.commit()
+
+        token = generate_confirmation_token(new_user.email)
+        confirm_url = url_for('confirm_email', token=token, _external=True)
+        html = render_template('activate.html', confirm_url=confirm_url)
+        subject = "Please confirm your email"
+        send_email(new_user.email, subject, html)
 
         return redirect('/')
         #return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
@@ -91,4 +101,25 @@ def signup():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.home'))
+    return redirect(url_for('home'))
+
+
+@app.route('/confirm/<token>')
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or has expired.', 'danger')
+    user = User.query.filter_by(email=email).first_or_404()
+    if user.confirmed:
+        flash('Account already confirmed. Please login.', 'success')
+        return redirect(url_for('login'))
+    else:
+        user.confirmed = True
+        user.confirmed_on = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        flash('You have confirmed your account. Thanks!', 'success')
+    return render_template('confirm_email.html', error=None, messages={
+        'client': user.username if user else 'Client'
+    })

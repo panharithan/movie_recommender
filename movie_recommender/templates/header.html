@@ -32,7 +32,7 @@
     <a href="#news">TV Series</a>
     <a href="#contact"><i class="fa fa-fw fa-envelope"></i>Contact</a>
     <a href="#about"><i class="fa fa-fw fa-envelope"></i>About</a>
-    {%if username:%}
+    {% if is_authenticated %}
     <a href="/logout"><i class="fa fa-fw fa-user"></i> Logout</a>
     {%else%}
     <a href="/login"><i class="fa fa-fw fa-user"></i> Login</a>

@@ -15,20 +15,19 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default_user.png')
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
-    def __init__(self, username, email, password, confirmed=False, is_admin=False, confirmed_on=None):
+    def __init__(self, username, email, password, confirmed=False, is_admin=False):
         self.username = username
         self.email = email
         self.password = sha256_crypt.encrypt(password)
-        self.registered_on = datetime.now()
         self.is_admin = is_admin
         self.confirmed = confirmed
-        self.confirmed_on = confirmed_on
 
 
 class Movie(db.Model):
