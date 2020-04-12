@@ -1,3 +1,5 @@
+from passlib.hash import sha256_crypt
+from sqlalchemy import or_
 from flask import render_template, url_for, flash, redirect, request, session, flash
 from movie_recommender import app
 from movie_recommender.forms import LoginForm
@@ -57,14 +59,13 @@ def login():
     form = LoginForm()
     error = None
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            if check_password_hash(user.password, form.password.data):
-                login_user(user, remember=form.remember.data)
-                session['username'] = request.form['username']
-                if session['username'] == 'theman':
-                    return redirect(url_for('dashboard'))
-                return redirect(url_for('home'))
+        conds = [User.username == form.username.data, User.email == form.username.data]
+        user = User.query.filter(or_(*conds)).first()
+        if user and sha256_crypt.verify(form.password.data, user.password):
+            login_user(user, remember=form.remember.data)
+            if current_user.is_admin:
+                return redirect(url_for('dashboard'))
+            return redirect(url_for('home'))
 
         error = 'Invalid User'
         flash(error)
@@ -87,7 +88,7 @@ def signup():
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('username', None)
-    session.pop('user_id', None)
-    return redirect(url_for('home'))
+    logout_user()
+    return redirect(url_for('main.home'))
