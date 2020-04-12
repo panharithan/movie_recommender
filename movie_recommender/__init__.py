@@ -8,6 +8,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movie_recommender.db'
 app.config['UPLOAD_FOLDER'] = '/home/panharith/Documents/Flask/movie_recommender/movie_recommender/static/photos'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True     # disable warning
+
 
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)

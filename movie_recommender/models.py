@@ -1,3 +1,4 @@
+from passlib.hash import sha256_crypt
 from movie_recommender import db
 from datetime import datetime
 from flask_wtf import FlaskForm
@@ -7,6 +8,7 @@ from wtforms.validators import InputRequired, Email, Length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from movie_recommender import login_manager
 from wtforms.widgets import html5
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +20,15 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+
+    def __init__(self, username, email, password, confirmed=False, is_admin=False, confirmed_on=None):
+        self.username = username
+        self.email = email
+        self.password = sha256_crypt.encrypt(password)
+        self.registered_on = datetime.now()
+        self.is_admin = is_admin
+        self.confirmed = confirmed
+        self.confirmed_on = confirmed_on
 
 
 class Movie(db.Model):
