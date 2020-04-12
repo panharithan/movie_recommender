@@ -14,11 +14,28 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
 def allowed_file(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def _save_file(files):
+    for file in files:
+        if file.filename == '':
+            flash('No file selected for uploading')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File successfully uploaded')
+            return redirect('/')
+        else:
+            flash('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
+            return redirect(request.url)
+
 
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
-    if session.get('username') != 'theman':
+    if not current_user.is_admin:
         return redirect(url_for('login'))
     flash("welcome back sir")
     movies = []
@@ -38,28 +55,12 @@ def dashboard():
     return render_template('dashboard.html', movies=movies)
 
 
-def _save_file(files):
-    for file in files:
-        if file.filename == '':
-            flash('No file selected for uploading')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            flash('File successfully uploaded')
-            return redirect('/')
-        else:
-            flash('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
-            return redirect(request.url)
-
-
-
 @app.route('/new_movie', methods=['GET', 'POST'])
+@login_required
 def new_movie():
+    if not current_user.is_admin:
+        return redirect(url_for('login'))
     form = MovieForm()
-    if request.method == 'GET':
-        if session.get('username') != 'theman':
-            return redirect(url_for('login'))
     if request.method == 'POST':
         if form.validate_on_submit():
             # if user does not select file, browser also
@@ -88,7 +89,4 @@ def new_movie():
             for movie in Movie.query.all():
                 print(movie)
 
-
-
-    return render_template('new_movie.html', form=form,error=False)
-
+    return render_template('new_movie.html', form=form, error=False)

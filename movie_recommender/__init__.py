@@ -19,4 +19,11 @@ login_manager.login_view = 'login'
 
 migrate = Migrate(app, db)
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    from movie_recommender.models import User
+    return User.query.filter(User.id == int(user_id)).first()
+
+
 from movie_recommender import routes, admin_routes
