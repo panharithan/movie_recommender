@@ -2,3 +2,4 @@ venv/
 .idea/
 *.pyc
 __/pycache/__
+migrations/

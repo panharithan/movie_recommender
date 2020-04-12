@@ -26,3 +26,17 @@ For Windows
 
 IV) Browser our website locally by going to any web browser and enter this url:
     http://localhost:5000
+
+
+V) Migrate database (optional)
+For Linux or Mac
+    $ export FLASK_APP=run.py
+    $ flask db init
+    $ flask db migrate
+    $ flask db upgrade
+For Windows
+    $ set FLASK_APP=run.py
+    $ flask db init
+    $ flask db migrate
+    $ flask db upgrade
+
