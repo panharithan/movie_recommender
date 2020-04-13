@@ -3,3 +3,4 @@ venv/
 *.pyc
 __/pycache/__
 migrations/
+movie_recommender/sqlite3project/

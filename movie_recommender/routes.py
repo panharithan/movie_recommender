@@ -64,6 +64,11 @@ def login():
     if form.validate_on_submit():
         conds = [User.username == form.username.data, User.email == form.username.data]
         user = User.query.filter(or_(*conds)).first()
+        if not user.confirmed:
+            error = 'Please confirm your account first.'
+            flash(error)
+            return render_template('login.html', form=form, error=error)
+
         if user and sha256_crypt.verify(form.password.data, user.password):
             login_user(user, remember=form.remember.data)
             if current_user.is_admin:
@@ -79,6 +84,12 @@ def login():
 def signup():
     form = RegisterForm()
     if form.validate_on_submit():
+        conds = [User.username == form.username.data, User.email == form.username.data]
+        user = User.query.filter(or_(*conds)).first()
+        if user:
+            return render_template('register.html', form=form,
+                                   error="you are already registered")
+
         new_user = User(username=form.username.data, email=form.email.data,
                         password=form.password.data, is_admin=False)
 
@@ -91,7 +102,7 @@ def signup():
         subject = "Please confirm your email"
         send_email(new_user.email, subject, html)
 
-        return redirect('/')
+        return render_template('register.html', form=form, success="Successfully registered. Please confirm your account in Email.")
         #return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
 
     return render_template('register.html', form=form)
